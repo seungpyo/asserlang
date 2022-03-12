@@ -16,11 +16,11 @@ type Tokenizer struct {
 	length      int
 }
 
-func NewTokenizer(line string) Tokenizer {
+func NewTokenizer(line string, reserved map[string]TokenType) Tokenizer {
 	return Tokenizer{
 		TokenBuffer: "",
 		Tokens:      []Token{},
-		Reserved:    map[string]TokenType{},
+		Reserved:    reserved,
 		line:        []rune(line),
 		pos:         0,
 		length:      utf8.RuneCountInString(line),
@@ -33,11 +33,6 @@ func (t *Tokenizer) String() string {
 		fmt.Println("Marshalizing Tokenizer:", err)
 	}
 	return string(s)
-}
-
-func (t *Tokenizer) Reserve(reserved string, tokenType TokenType) *Tokenizer {
-	t.Reserved[reserved] = tokenType
-	return t
 }
 
 func (t *Tokenizer) Append(tok *Token) {
@@ -58,6 +53,7 @@ func (t *Tokenizer) Next() error {
 		return errors.New("end of line")
 	}
 
+	// Case 1. Current buffer is a reserved word
 	t.TokenBuffer += string(t.line[t.pos])
 	bufferType := t.TypeQuery(t.TokenBuffer)
 	if bufferType != ID {
@@ -67,6 +63,12 @@ func (t *Tokenizer) Next() error {
 		return nil
 	}
 
+	// Case 2. End of line (e.g. ㅇㅉ냉장고)
+	if t.pos+1 >= t.length {
+		t.Append(NewToken(t.TokenBuffer, ID))
+		t.pos++
+		return nil
+	}
 	nextChar := string(t.line[t.pos+1])
 	peakedType := t.TypeQuery(nextChar)
 	if peakedType != ID {

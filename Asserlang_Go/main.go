@@ -24,18 +24,13 @@ func main() {
 	for scanner.Scan() {
 		line := scanner.Text()
 		lineNum++
-		tokenizer := token.NewTokenizer(line)
-		tokenizer = *tokenizer.
-			Reserve("ㅋ", token.INCR).
-			Reserve("ㅎ", token.DECR).
-			Reserve("ㅌ", token.MUL).
-			Reserve("쿠쿠루삥뽕", token.START_PROGRAM).
-			Reserve("슉슈슉슉", token.END_PROGRAM)
+		tokenizer := token.NewTokenizer(line, token.TokenTypeDict)
 		iter := 0
 		for tokenizer.Next() == nil {
 			iter++
 		}
-		fmt.Println(line, tokenizer.Tokens)
+		fmt.Println(line)
+		fmt.Println(tokenizer.Tokens)
 	}
 
 }
