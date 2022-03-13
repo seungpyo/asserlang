@@ -9,6 +9,7 @@ type TokenType uint
 
 const (
 	NONE = iota + 1
+	EOL
 	INCR
 	DECR
 	MUL

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/seungpyo/asserlang/astv_parser"
 	"github.com/seungpyo/asserlang/token"
 )
 
@@ -21,16 +22,21 @@ func main() {
 	}
 	scanner := bufio.NewScanner(f)
 	lineNum := 0
+	tokenizer := token.NewTokenizer(token.TokenTypeDict)
 	for scanner.Scan() {
 		line := scanner.Text()
+		tokenizer.Feed(line)
 		lineNum++
-		tokenizer := token.NewTokenizer(line, token.TokenTypeDict)
 		iter := 0
 		for tokenizer.Next() == nil {
 			iter++
 		}
-		fmt.Println(line)
-		fmt.Println(tokenizer.Tokens)
 	}
+	// fmt.Println(tokenizer.Tokens)
 
+	fmt.Println(tokenizer.Tokens)
+	parser := astv_parser.NewParser(tokenizer.Tokens)
+	for parser.NextLine() == nil {
+		fmt.Println(parser.CurrentLine())
+	}
 }
